@@ -1,0 +1,85 @@
+<html>
+<head>
+  <title>colorfiver</title>
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <div class="half">
+    <section id="playarea"></section>
+  </div>
+  <div class="half">
+    <section id="message" class="hide">Otur, men kul att du var med och spelade.
+    <p>Här ser du vad du har vunnit (Elva miljoner!)</section>
+    <section id="prizearea"></section>
+  </div>
+</body>
+</html>
+<script type="module">
+  import luckor from './luckor.js';
+
+  var colors = [];
+  var priser = [];
+
+  // Blanda luckorna.
+  shuffleArray(luckor);
+
+  var playarea = document.getElementById('playarea');
+
+  // Skapa 25 luckor
+  luckor.forEach(function(lucka) {
+    let luckElement = document.createElement('div');
+    luckElement.innerHTML = `
+    <div class='flip-card'>
+      <div class='flip-card-inner'>
+        <div class='flip-card-front' id='` + lucka.id + `'>
+        </div>
+        <div class='flip-card-back ` + lucka.color + `'>
+          <p>` + lucka.vinst + `</p>
+        </div>
+      </div>
+    </div>`;
+    luckElement.classList.add('lucka');
+    playarea.appendChild(luckElement);
+  })
+
+  playarea.addEventListener('click', function(e){
+    if (e.target.nodeName == "DIV") {
+
+      // Hitta rätt element att sätta en klass på, för att vända på kortet.
+      e.target.parentNode.parentNode.classList.add('chosen');
+
+
+      // Hämta först info om priset.
+      let priset = luckor.find( lucka => lucka.id == e.target.id);
+
+      // Om spelaren inte tidigare vänt upp denna färg...
+      if (!colors.includes(priset.color)) {
+        colors.push(priset.color);
+        // Lägg till priset.
+        priser.push(priset.vinst);
+        console.log(priser)
+      }
+      else { // ...spelet är slut
+        let messArea = document.getElementById('message');
+        messArea.classList.add('show');
+        priser.forEach(function(pris) {
+          var prislista = document.createElement('ul');
+          prislista.innerHTML = `
+            <li> ${pris} </li>
+          `;
+        messArea.appendChild(prislista);
+        })
+        // Stäng av klickbarheten.
+        document.getElementById('playarea').style.pointerEvents = 'none';
+      }
+    }
+  })
+
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+</script>
